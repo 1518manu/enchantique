@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { useShop } from '../context/ShopContext';
 import { STORE_INFO } from '../data/mockData';
 import {
@@ -20,8 +21,10 @@ import {
 } from 'lucide-react';
 
 export const ProductDetailPage = () => {
+  const { id } = useParams();
   const {
-    selectedProduct: product,
+    selectedProduct: contextProduct,
+    setSelectedProductId,
     products,
     addToCart,
     toggleWishlist,
@@ -31,9 +34,19 @@ export const ProductDetailPage = () => {
     showToast
   } = useShop();
 
+  const product = (id ? products.find(p => p.id === id) : null) || contextProduct || products[0];
+
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [selectedVariant, setSelectedVariant] = useState(product.colorVariants?.[0]?.name || 'Standard');
-  const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || 'Standard');
+  const [selectedVariant, setSelectedVariant] = useState(product?.colorVariants?.[0]?.name || 'Standard');
+  const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0] || 'Standard');
+
+  useEffect(() => {
+    if (product) {
+      setActiveImageIndex(0);
+      setSelectedVariant(product.colorVariants?.[0]?.name || 'Standard');
+      setSelectedSize(product.sizes?.[0] || 'Standard');
+    }
+  }, [product?.id]);
   const [quantity, setQuantity] = useState(1);
   const [pincode, setPincode] = useState('');
   const [pincodeResult, setPincodeResult] = useState(null);

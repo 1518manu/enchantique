@@ -1,4 +1,5 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import { useShop } from '../context/ShopContext';
 import { JOURNAL_POSTS, STORE_INFO } from '../data/mockData';
 import {
@@ -12,9 +13,11 @@ import {
 } from 'lucide-react';
 
 export const JournalPage = () => {
+  const { id } = useParams();
   const { selectedArticleId, setSelectedArticleId, navigate, showToast } = useShop();
 
-  const currentArticle = JOURNAL_POSTS.find(p => p.id === selectedArticleId);
+  const activeArticleId = id || selectedArticleId;
+  const currentArticle = JOURNAL_POSTS.find(p => p.id === activeArticleId);
 
   const handleShare = () => {
     if (navigator.share) {
@@ -31,11 +34,11 @@ export const JournalPage = () => {
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
       {/* If Viewing Specific Article */}
-      {selectedArticleId && currentArticle ? (
+      {currentArticle ? (
         <article className="container" style={{ maxWidth: '840px', margin: '0 auto', paddingTop: '1.5rem' }}>
           {/* Back button */}
           <button
-            onClick={() => setSelectedArticleId(null)}
+            onClick={() => navigate('journal')}
             style={{
               display: 'inline-flex',
               alignItems: 'center',

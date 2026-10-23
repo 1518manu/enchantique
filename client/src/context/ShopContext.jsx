@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { MOCK_PRODUCTS, STORE_INFO } from '../data/mockData';
 
 const ShopContext = createContext();
@@ -12,6 +13,9 @@ export const useShop = () => {
 };
 
 export const ShopProvider = ({ children }) => {
+  const routerNavigate = useNavigate();
+  const location = useLocation();
+
   // Navigation & View
   const [activeTab, setActiveTab] = useState('home');
   const [selectedProductId, setSelectedProductId] = useState('ench-001');
@@ -124,19 +128,96 @@ export const ShopProvider = ({ children }) => {
     }, 3500);
   };
 
+  // Sync activeTab and relevant state with URL changes (supports direct link, refresh, Back/Forward buttons)
+  useEffect(() => {
+    const path = location.pathname;
+    if (path === '/' || path === '') {
+      setActiveTab('home');
+    } else if (path.startsWith('/shop')) {
+      setActiveTab('shop');
+    } else if (path.startsWith('/product')) {
+      setActiveTab('product');
+      const parts = path.split('/').filter(Boolean);
+      if (parts[1]) {
+        setSelectedProductId(parts[1]);
+      }
+    } else if (path.startsWith('/bespoke')) {
+      setActiveTab('bespoke');
+    } else if (path.startsWith('/story')) {
+      setActiveTab('story');
+    } else if (path.startsWith('/journal')) {
+      setActiveTab('journal');
+      const parts = path.split('/').filter(Boolean);
+      if (parts[1]) {
+        setSelectedArticleId(parts[1]);
+      } else {
+        setSelectedArticleId(null);
+      }
+    } else if (path.startsWith('/help')) {
+      setActiveTab('help');
+      const parts = path.split('/').filter(Boolean);
+      if (parts[1]) {
+        setHelpSubTab(parts[1]);
+      }
+    } else if (path.startsWith('/checkout')) {
+      setActiveTab('checkout');
+    } else if (path.startsWith('/account')) {
+      setActiveTab('account');
+    }
+  }, [location.pathname]);
+
   const navigate = (tab, data = null) => {
     setActiveTab(tab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (tab === 'product' && data) {
-      setSelectedProductId(data);
-    }
-    if (tab === 'journal' && data) {
-      setSelectedArticleId(data);
-    }
-    if (tab === 'help' && data) {
-      setHelpSubTab(data);
-    }
     setIsMobileMenuOpen(false);
+
+    switch (tab) {
+      case 'home':
+        routerNavigate('/');
+        break;
+      case 'shop':
+        routerNavigate('/shop');
+        break;
+      case 'product':
+        if (data) {
+          setSelectedProductId(data);
+          routerNavigate(`/product/${data}`);
+        } else {
+          routerNavigate(`/product/${selectedProductId}`);
+        }
+        break;
+      case 'bespoke':
+        routerNavigate('/bespoke');
+        break;
+      case 'story':
+        routerNavigate('/story');
+        break;
+      case 'journal':
+        if (data) {
+          setSelectedArticleId(data);
+          routerNavigate(`/journal/${data}`);
+        } else {
+          setSelectedArticleId(null);
+          routerNavigate('/journal');
+        }
+        break;
+      case 'help':
+        if (data) {
+          setHelpSubTab(data);
+          routerNavigate(`/help/${data}`);
+        } else {
+          routerNavigate('/help');
+        }
+        break;
+      case 'checkout':
+        routerNavigate('/checkout');
+        break;
+      case 'account':
+        routerNavigate('/account');
+        break;
+      default:
+        routerNavigate('/');
+    }
   };
 
   const toggleLanguage = () => {

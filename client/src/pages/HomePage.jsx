@@ -49,11 +49,11 @@ export const HomePage = () => {
       <section style={{
         position: 'relative',
         width: '100%',
-        minHeight: '560px',
+        minHeight: '660px',
         backgroundColor: 'var(--color-obsidian)',
         overflow: 'hidden',
         display: 'flex',
-        alignItems: 'flex-end',
+        alignItems: 'center',
         color: '#ffffff'
       }}>
         {/* Background Kasavu Bride Model Image */}

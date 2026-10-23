@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { useShop } from '../context/ShopContext';
 import { STORE_INFO, FAQS } from '../data/mockData';
 import {
@@ -17,7 +18,14 @@ import {
 } from 'lucide-react';
 
 export const HelpPage = () => {
-  const { helpSubTab, setHelpSubTab, showToast } = useShop();
+  const { tab } = useParams();
+  const { helpSubTab, setHelpSubTab, showToast, navigate } = useShop();
+
+  useEffect(() => {
+    if (tab && tab !== helpSubTab) {
+      setHelpSubTab(tab);
+    }
+  }, [tab, helpSubTab, setHelpSubTab]);
 
   const [contactName, setContactName] = useState('');
   const [contactPhone, setContactPhone] = useState('');
@@ -93,7 +101,7 @@ export const HelpPage = () => {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setHelpSubTab(tab.id)}
+                  onClick={() => navigate('help', tab.id)}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
